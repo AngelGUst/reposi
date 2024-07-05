@@ -47,7 +47,7 @@ public class UsuarioDao {
 
     public boolean insert(Usuario u) {
         boolean flag = false;
-        String query = "insert into usuario(nombre_usuario,contra,correo,tipo_usuario,estado) values(?,sha2(?,256),?,?,?) ";
+        String query = "insert into usuario(,nombre_usuario,contra,correo,tipo_usuario,estado) values(?,sha2(?,256),?,?,?) ";
         try {
             Connection con = DatabaseConnectionManager.getConnection();
             PreparedStatement ps = con.prepareStatement(query);
@@ -188,4 +188,59 @@ public class UsuarioDao {
         return u;
     }
 
+    public Usuario verificarUsuario(String correo) {
+        Usuario u = new Usuario();
+        String query = "SELECT * FROM usuario WHERE correo = ?";
+        try {
+            Connection con = DatabaseConnectionManager.getConnection();
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, correo);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                u.setId(rs.getInt("id"));
+                u.setCorreo(rs.getString("correo"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return u;
+    }
+
+    public boolean insertarCodigo(int id, String codigo) {
+        boolean flag = false;
+        String query = "INSERT INTO codigo_recuperacion (correo, codigo) VALUES (?, ?)";
+        try {
+            Connection con = DatabaseConnectionManager.getConnection();
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setInt(1, id);
+            ps.setString(2, codigo);
+            if (ps.executeUpdate() == 1) {
+                flag = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
+    public Usuario verificarCodigo(String codigo) {
+        Usuario u = new Usuario();
+        String query = "SELECT u.* FROM usuario u JOIN codigo_recuperacion cr ON u.id = cr.usuario_id WHERE cr.codigo = ?";
+        try {
+            Connection con = DatabaseConnectionManager.getConnection();
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, codigo);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                u.setId(rs.getInt("id"));
+                u.setNombre_usuario(rs.getString("nombre_usuario"));
+                u.setCorreo(rs.getString("correo"));
+                u.setTipo_usuario(rs.getInt("tipo_usuario"));
+                u.setEstado(rs.getBoolean("estado"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return u;
+    }
 }

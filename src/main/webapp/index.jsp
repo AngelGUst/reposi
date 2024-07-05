@@ -26,5 +26,6 @@
 <a href="registrarUsuario.jsp">Registrarme</a>
 <a href="gestionUsuario.jsp">Ver Usuarios</a>
 <a href="solicitudRecuperacion.jsp">Actualizar Contra</a>
+<a href="recuperacion.jsp">Recuperar contraseña</a>
 </body>
 </html>

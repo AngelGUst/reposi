@@ -1,16 +1,25 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: angel
-  Date: 03/07/2024
-  Time: 07:17 p. m.
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Title</title>
+    <title>Cambio de Contraseña</title>
 </head>
 <body>
-
+<%
+    String mensaje = (String) session.getAttribute("mensaje");
+    if (mensaje != null) {
+%>
+<p style="color:red;"><%= mensaje %></p>
+<%
+        session.removeAttribute("mensaje");
+    }
+    String codigo = request.getParameter("codigo");
+%>
+<form action="updateContra" method="post">
+    <label for="nuevaContra">Nueva Contraseña:</label>
+    <input type="password" id="nuevaContra" name="nuevaContra" required><br><br>
+    <input type="hidden" name="codigo" value="<%= codigo %>">
+    <button type="submit">Cambiar</button>
+</form>
 </body>
 </html>

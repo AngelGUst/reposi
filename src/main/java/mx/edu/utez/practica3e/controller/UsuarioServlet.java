@@ -41,7 +41,7 @@ public class UsuarioServlet extends HttpServlet {
             resp.sendRedirect(ruta);
         }else{
             //Si existe el usuario
-            ruta="bienvenido.jsp";
+            ruta="recuperacion.jsp";
             HttpSession sesion = req.getSession();
             sesion.setAttribute("usuario",u);
             resp.sendRedirect(ruta);

@@ -26,8 +26,8 @@ import static com.google.api.services.gmail.GmailScopes.GMAIL_SEND;
 import static jakarta.mail.Message.RecipientType.TO;
 public class GmailSender {
     private static final String TOKENS_DIRECTORY_PATH = "src/main/resources/tokens";
-    private static final String FROM = "lagunes.derick@gmail.com";
-    private final Gmail service;
+    private static final String FROM = "Cursos.Induccion777@gmail.com";
+    private static Gmail service = null;
     public GmailSender() throws Exception {
         NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         GsonFactory jsonFactory = GsonFactory.getDefaultInstance();
@@ -47,7 +47,7 @@ public class GmailSender {
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
-    public void sendMail(String para, String asunto, String mensaje) throws Exception {
+    public static void sendMail(String para, String asunto, String mensaje) throws Exception {
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage email = new MimeMessage(session);
