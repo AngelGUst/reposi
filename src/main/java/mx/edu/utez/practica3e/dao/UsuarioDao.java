@@ -47,7 +47,7 @@ public class UsuarioDao {
 
     public boolean insert(Usuario u) {
         boolean flag = false;
-        String query = "insert into usuario(,nombre_usuario,contra,correo,tipo_usuario,estado) values(?,sha2(?,256),?,?,?) ";
+        String query = "insert into usuario(nombre_usuario,contra,correo,tipo_usuario,estado) values(?,sha2(?,256),?,?,?)";
         try {
             Connection con = DatabaseConnectionManager.getConnection();
             PreparedStatement ps = con.prepareStatement(query);
@@ -150,55 +150,20 @@ public class UsuarioDao {
         return flag;
     }
 
-    public Usuario veficicarUsuario(String correo) {
-        Usuario u = new Usuario();
+    public Usuario getByEmail(String email) {
+        Usuario u = null;
         String query = "select * from usuario where correo = ?";
         try {
             Connection con = DatabaseConnectionManager.getConnection();
             PreparedStatement ps = con.prepareStatement(query);
-            ps.setString(1, correo);
+            ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                u.setCorreo(rs.getString("correo"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return u;
-    }
-
-    public Usuario inCodigo(String contra, String codigo, int id) {
-        Usuario u = new Usuario();
-        String query = "update usuario set contra = ?, codigo = ? where id = ?";
-        try {
-            Connection con = DatabaseConnectionManager.getConnection();
-            PreparedStatement ps = con.prepareStatement(query);
-            ps.setString(1, contra);
-            ps.setString(2, codigo);
-            ps.setInt(3, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                u.setContra(rs.getString("contra"));
-                u.setCodigo(rs.getString("codigo"));
+                u = new Usuario();
                 u.setId(rs.getInt("id"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return u;
-    }
-
-    public Usuario verificarUsuario(String correo) {
-        Usuario u = new Usuario();
-        String query = "SELECT * FROM usuario WHERE correo = ?";
-        try {
-            Connection con = DatabaseConnectionManager.getConnection();
-            PreparedStatement ps = con.prepareStatement(query);
-            ps.setString(1, correo);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                u.setId(rs.getInt("id"));
+                u.setNombre_usuario(rs.getString("nombre_usuario"));
                 u.setCorreo(rs.getString("correo"));
+                u.setCodigoRecuperacion(rs.getString("codigo_recuperacion"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -206,15 +171,15 @@ public class UsuarioDao {
         return u;
     }
 
-    public boolean insertarCodigo(int id, String codigo) {
+    public boolean updateCodigoRecuperacion(Usuario u) {
         boolean flag = false;
-        String query = "INSERT INTO codigo_recuperacion (correo, codigo) VALUES (?, ?)";
+        String query = "update usuario set codigo = ? where id = ?";
         try {
             Connection con = DatabaseConnectionManager.getConnection();
             PreparedStatement ps = con.prepareStatement(query);
-            ps.setInt(1, id);
-            ps.setString(2, codigo);
-            if (ps.executeUpdate() == 1) {
+            ps.setString(1, u.getCodigoRecuperacion());
+            ps.setInt(2, u.getId());
+            if (ps.executeUpdate() > 0) {
                 flag = true;
             }
         } catch (SQLException e) {
@@ -223,20 +188,20 @@ public class UsuarioDao {
         return flag;
     }
 
-    public Usuario verificarCodigo(String codigo) {
-        Usuario u = new Usuario();
-        String query = "SELECT u.* FROM usuario u JOIN codigo_recuperacion cr ON u.id = cr.usuario_id WHERE cr.codigo = ?";
+    public Usuario getByCodigoRecuperacion(String codigo) {
+        Usuario u = null;
+        String query = "select * from usuario where codigo = ?";
         try {
             Connection con = DatabaseConnectionManager.getConnection();
             PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, codigo);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
+                u = new Usuario();
                 u.setId(rs.getInt("id"));
                 u.setNombre_usuario(rs.getString("nombre_usuario"));
                 u.setCorreo(rs.getString("correo"));
-                u.setTipo_usuario(rs.getInt("tipo_usuario"));
-                u.setEstado(rs.getBoolean("estado"));
+                u.setCodigoRecuperacion(rs.getString("codigo_recuperacion"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

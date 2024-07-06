@@ -1,62 +1,51 @@
 package mx.edu.utez.practica3e.controller;
+import jakarta.servlet.http.HttpServlet;
+
+
+import mx.edu.utez.practica3e.utils.GmailSender;
+import mx.edu.utez.practica3e.dao.UsuarioDao;
+import mx.edu.utez.practica3e.model.Usuario;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import mx.edu.utez.practica3e.dao.UsuarioDao;
 import mx.edu.utez.practica3e.model.Usuario;
-import mx.edu.utez.practica3e.utils.DatabaseConnectionManager;
-import mx.edu.utez.practica3e.utils.GmailSender;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.util.UUID;
 
 @WebServlet(name = "UpdateContraServlet", value = "/updateContra")
 public class UpdateContraServlet extends HttpServlet {
+    private final UsuarioDao usuarioDao = new UsuarioDao();
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String nuevaContra = req.getParameter("nuevaContra");
-        String codigo = req.getParameter("codigo");
-        HttpSession sesion = req.getSession();
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 1. Obtener nueva contraseña
+        String nuevaContra = request.getParameter("contraseña");
 
-        if (nuevaContra != null && !nuevaContra.isEmpty() && codigo != null && !codigo.isEmpty()) {
-            UsuarioDao dao = new UsuarioDao();
-            Usuario u = dao.verificarCodigo(codigo);
+        // 2. Obtener código
+        String codigo = request.getParameter("codigo");
 
-            if (u != null && u.getId() > 0) {
-                try (Connection con = DatabaseConnectionManager.getConnection()) {
-                    PreparedStatement ps = con.prepareStatement("UPDATE usuario SET contraseña = ?, codigo_recuperacion = NULL WHERE id = ?");
-                    ps.setString(1, nuevaContra);
-                    ps.setInt(2, u.getId());
-                    int rowsUpdated = ps.executeUpdate();
+        // 3. Actualizar contraseña y código en la BD
+        Usuario usuario = usuarioDao.getByCodigoRecuperacion(codigo);
+        if (usuario != null) {
+            usuario.setContra(nuevaContra);
+            usuario.setCodigoRecuperacion(null); // Limpiar el código
+            usuarioDao.update(usuario);
 
-                    if (rowsUpdated > 0) {
-                        sesion.setAttribute("mensaje", "La contraseña se ha actualizado correctamente.");
-
-                        // Opcional: Enviar un correo de confirmación
-                        GmailSender gmailSender = new GmailSender();
-                        gmailSender.sendMail(u.getCorreo(), "Contraseña Actualizada", "Tu contraseña ha sido actualizada exitosamente.");
-
-                        resp.sendRedirect("index.jsp");
-                    } else {
-                        sesion.setAttribute("mensaje", "Hubo un problema al actualizar la contraseña. Por favor, inténtalo de nuevo.");
-                        resp.sendRedirect("recuperacion.jsp?codigo=" + codigo);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    sesion.setAttribute("mensaje", "Hubo un error al procesar la solicitud.");
-                    resp.sendRedirect("recuperacion.jsp?codigo=" + codigo);
-                }
-            } else {
-                sesion.setAttribute("mensaje", "El código de recuperación no es válido.");
-                resp.sendRedirect("solicitudRecuperacion.jsp");
+            // 4. Opcional: enviar correo de aviso al usuario
+            try {
+                new GmailSender().sendMail(usuario.getCorreo(), "Contraseña actualizada", "Su contraseña ha sido actualizada correctamente.");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
+            // 5. Redirigir a Index.jsp
+            response.sendRedirect("index.jsp");
         } else {
-            sesion.setAttribute("mensaje", "Todos los campos son obligatorios.");
-            resp.sendRedirect("recuperacion.jsp?codigo=" + codigo);
+            request.getSession().setAttribute("mensaje", "Código inválido.");
+            response.sendRedirect("recuperacion.jsp");
         }
     }
 }

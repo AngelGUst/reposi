@@ -13,7 +13,7 @@ public class Usuario implements Serializable {
     private String correo;
     private int tipo_usuario;
     private boolean estado;
-    private String codigo;
+    private String codigo_recuperacion;
 
     public Usuario() {
     }
@@ -25,7 +25,6 @@ public class Usuario implements Serializable {
         this.correo = correo;
         this.tipo_usuario = tipo_usuario;
         this.estado = estado;
-        this.codigo = codigo;
     }
 
     public int getId() {
@@ -76,12 +75,12 @@ public class Usuario implements Serializable {
         this.estado = estado;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public String getCodigoRecuperacion() {
+        return codigo_recuperacion;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public void setCodigoRecuperacion(String codigo_recuperacion) {
+        this.codigo_recuperacion = codigo_recuperacion;
     }
 
 }

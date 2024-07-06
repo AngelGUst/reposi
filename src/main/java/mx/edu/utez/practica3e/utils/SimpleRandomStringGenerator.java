@@ -1,10 +1,8 @@
 package mx.edu.utez.practica3e.utils;
 
-
 import java.util.Random;
 
-public class generadoraCodigo {
-
+public class SimpleRandomStringGenerator {
     // Conjunto de caracteres permitidos
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final Random RANDOM = new Random();

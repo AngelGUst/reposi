@@ -27,7 +27,7 @@ import static jakarta.mail.Message.RecipientType.TO;
 public class GmailSender {
     private static final String TOKENS_DIRECTORY_PATH = "src/main/resources/tokens";
     private static final String FROM = "Cursos.Induccion777@gmail.com";
-    private static Gmail service = null;
+    private static Gmail service;
     public GmailSender() throws Exception {
         NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         GsonFactory jsonFactory = GsonFactory.getDefaultInstance();
